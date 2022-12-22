@@ -1,0 +1,102 @@
+esphome:
+  name: bedroom-airquality
+  comment: Bedroom Air Quality
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Secrets
+api:
+  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
+ota:
+  password: !secret ota_password
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: !secret ap_ssid
+    password: !secret ap_password
+
+captive_portal:
+
+i2c:
+  sda: 32
+  scl: 33
+uart:
+  rx_pin: 26
+  tx_pin: 25
+  baud_rate: 9600
+
+#deep_sleep:
+#  run_duration: 2s
+#  sleep_duration: 10s
+
+button:
+  - platform: template
+    name: Set CO2 street level
+    on_press:
+      - mhz19.calibrate_zero: mhz19_sensor
+sensor:
+  - platform: bme280
+    address: 0x76
+    temperature:
+      name: "Temperature"
+      oversampling: 4x
+      accuracy_decimals: 1
+      unit_of_measurement: "°C"
+      icon: "mdi:thermometer"
+      device_class: "temperature"
+      state_class: "measurement"
+      filters:
+      - offset: -2.7
+      - lambda: |-
+          float MAX_DIFFERENCE = 10.0;
+          static float last_value = NAN;
+          if (isnan(last_value) || std::abs(x - last_value) < MAX_DIFFERENCE)
+            return last_value = x;
+          else
+            return {};
+    pressure:
+      name: "Pressure"
+      accuracy_decimals: 0
+      unit_of_measurement: "hPa"
+      icon: "mdi:arrow-collapse-down"
+      #device_class: "atmospheric_pressure"
+      state_class: "measurement"
+    humidity:
+      name: "Humidity"
+      oversampling: 4x
+      accuracy_decimals: 1
+      unit_of_measurement: "%"
+      icon: "mdi:water-percent"
+      device_class: "humidity"
+      state_class: "measurement"
+      filters:
+        - calibrate_linear:
+            - 32.0 -> 38.0
+            - 70.0 -> 72
+    update_interval: 5s
+  - platform: mhz19
+    id: mhz19_sensor
+    co2:
+      name: "CO2"
+      unit_of_measurement: "ppm"
+      icon: "mdi:molecule-co2"
+      device_class: "carbon_dioxide"
+      state_class: "measurement"
+    temperature:
+      name: "Temperature (MH-Z19)"
+      accuracy_decimals: 1
+      unit_of_measurement: "°C"
+      icon: "mdi:thermometer"
+      device_class: "temperature"
+      state_class: "measurement"
+      disabled_by_default: true
+    update_interval: 7s
+    automatic_baseline_calibration: false

@@ -1,28 +1,17 @@
-#define EX_ARDUINOHA_BINARY_SENSOR
-#define EX_ARDUINOHA_CAMERA
-#define EX_ARDUINOHA_COVER
-#define EX_ARDUINOHA_DEVICE_TRACKER
-#define EX_ARDUINOHA_DEVICE_TRIGGER
-#define EX_ARDUINOHA_FAN
-#define EX_ARDUINOHA_HVAC
-#define EX_ARDUINOHA_LIGHT
-#define EX_ARDUINOHA_LOCK
-#define EX_ARDUINOHA_SCENE
-#define EX_ARDUINOHA_SELECT
-#define EX_ARDUINOHA_SWITCH
-#define EX_ARDUINOHA_TAG_SCANNER
+#include "optimize.hpp"
 
 #include <WiFiClientSecure.h>
 #include <Preferences.h>
+#include <Wire.h>
+#include <WiFi.h>
+
 #include <ArduinoHA.h>
 #include <ArduinoHADefines.h>
 #include <HADevice.h>
 #include <HAMqtt.h>
-#include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <MHZ.h>
-#include <WiFi.h>
 
 #include "calibration.hpp"
 #include "secrets.hpp"
@@ -79,8 +68,6 @@ void initHass() {
   byte mac[6];
   WiFi.macAddress(mac);
 
-  Serial.println("Initializing hass");
-
   device.setUniqueId(mac, 6);
   device.setName("Air quality monitor");
   device.setSoftwareVersion("0.1");
@@ -93,7 +80,6 @@ void initHass() {
 }
 
 void initWiFi() {
-  long currentMillis = millis();
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi ..");
