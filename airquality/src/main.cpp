@@ -94,10 +94,14 @@ void initWiFi() {
 }
 
 void setupTempSensor() {
+  Serial.print("i2c clock ");
+  Serial.println(i2cBme.getClock());
+
   i2cBme.begin(I2C_SDA, I2C_SCL, 100000);
   bool status = bme.begin(0x76, &i2cBme);
   if (!status) {
-    Serial.println("Could not connect to BME sensor!");
+    Serial.print("Could not connect to BME sensor! error");
+    Serial.println(i2cBme.getWriteError());
   }
 
   Serial.print("Setting temp compensation to ");
