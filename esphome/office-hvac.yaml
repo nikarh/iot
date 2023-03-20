@@ -1,0 +1,49 @@
+esphome:
+  name: office-hvac
+esp32:
+  board: esp32-s2-saola-1
+  framework:
+    type: arduino
+
+# Secrets
+api:
+  encryption:
+    key: !secret api_encryption_key
+ota:
+  password: !secret ota_password
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: Office HVAC
+    password: !secret ap_password
+
+logger:
+  level: VERBOSE
+
+uart:
+  tx_pin: GPIO18
+  rx_pin: GPIO16
+  baud_rate: 9600
+  parity: EVEN
+
+external_components:
+  source: github://DomiStyle/esphome-panasonic-ac
+  components: [panasonic_ac]
+
+climate:
+  - platform: panasonic_ac
+    type: cnt
+    name: Panasonic AC
+    horizontal_swing_select:
+      name: Panasonic AC Horizontal Swing Mode
+    vertical_swing_select:
+      name: Panasonic AC Vertical Swing Mode
+    outside_temperature:
+      name: Panasonic AC Outside Temperature
+    nanoex_switch:
+      name: Panasonic AC NanoeX Switch
+    mild_dry_switch:
+      name: Panasonic AC Mild Dry Switch
+    current_power_consumption:
+      name: Panasonic AC Power Consumption
